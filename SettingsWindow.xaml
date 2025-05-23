@@ -1,0 +1,218 @@
+﻿<Window x:Class="HandleIt.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HandleIt"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=local:Config}"
+        Title="Settings" Width="450" Height="550" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <Style TargetType="Label">
+            <Setter Property="Margin" Value="0,5,0,0" />
+            <Setter Property="Padding" Value="0,0,0,5" />
+        </Style>
+        <Style TargetType="GroupBox">
+            <Setter Property="Margin" Value="5,5,5,10" />
+            <Setter Property="Padding" Value="5" />
+        </Style>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        
+        <local:RadioButtonCheckedConverter x:Key="RadioButtonCheckedConverter"/>
+        <local:ColorToHexConverter x:Key="ColorToHexConverter"/>
+    </Window.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TabControl Grid.Row="0">
+            <!-- General Tab -->
+            <TabItem Header="General">
+                <GroupBox Header="Window Settings">
+                    <StackPanel>
+                        <CheckBox Content="Always on top" IsChecked="{Binding AlwaysOnTop}" Margin="0,5" />
+                        <CheckBox Content="Lock position" IsChecked="{Binding LockPosition}" Margin="0,5" />
+                    </StackPanel>
+                </GroupBox>
+            </TabItem>
+
+            <!-- Theme Tab -->
+            <TabItem Header="Theme">
+                <StackPanel>
+                    <GroupBox Header="Theme">
+                        <StackPanel>
+                            <RadioButton GroupName="ThemeMode" Content="Light Mode"
+                                         IsChecked="{Binding ThemeMode, ConverterParameter=Light, Mode=TwoWay, 
+                                         Converter={StaticResource ResourceKey=RadioButtonCheckedConverter}}"
+                                         Margin="0,5" />
+                            <RadioButton GroupName="ThemeMode" Content="Dark Mode"
+                                         IsChecked="{Binding ThemeMode, ConverterParameter=Dark, Mode=TwoWay, 
+                                         Converter={StaticResource ResourceKey=RadioButtonCheckedConverter}}"
+                                         Margin="0,5" />
+                            <RadioButton GroupName="ThemeMode" Content="System Default"
+                                         IsChecked="{Binding ThemeMode, ConverterParameter=System, Mode=TwoWay, 
+                                         Converter={StaticResource ResourceKey=RadioButtonCheckedConverter}}"
+                                         Margin="0,5" />
+                            <RadioButton GroupName="ThemeMode" Content="Custom"
+                                         IsChecked="{Binding ThemeMode, ConverterParameter=Custom, Mode=TwoWay, 
+                                         Converter={StaticResource ResourceKey=RadioButtonCheckedConverter}}"
+                                         Margin="0,5" />
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox Header="Custom Theme Options" IsEnabled="{Binding IsCustomTheme}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <!-- Font Family -->
+                            <Label Grid.Row="0" Grid.Column="0" Content="Font Family:" />
+                            <ComboBox Grid.Row="0" Grid.Column="1"
+                                      ItemsSource="{Binding Source={x:Static local:FontService.Instance}, Path=FontFamilies}"
+                                      SelectedValue="{Binding FontFamily}"
+                                      SelectedValuePath="Source"/>
+
+
+                            <!-- Font Size -->
+                            <Label Grid.Row="1" Grid.Column="0" Content="Font Size:" />
+                            <Grid Grid.Row="1" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Text="{Binding FontSize, UpdateSourceTrigger=PropertyChanged}" />
+                                <StackPanel Grid.Column="1" Orientation="Vertical">
+                                    <Button Content="▲" Width="20" Height="15" Click="IncrementFontSize_Click" />
+                                    <Button Content="▼" Width="20" Height="15" Click="DecrementFontSize_Click" />
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Background Color -->
+                            <Label Grid.Row="2" Grid.Column="0" Content="Background Color:" />
+                            <Grid Grid.Row="2" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0"
+                                         Text="{Binding BackgroundColor, Converter={StaticResource ColorToHexConverter}, UpdateSourceTrigger=PropertyChanged}" />
+                                <Button Grid.Column="1" Width="25" Content="..." Click="BackgroundColor_Click">
+                                    <!-- TODO: Implement color picker dialog -->
+                                </Button>
+                            </Grid>
+
+                            <!-- Foreground Color -->
+                            <Label Grid.Row="3" Grid.Column="0" Content="Foreground Color:" />
+                            <Grid Grid.Row="3" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0"
+                                         Text="{Binding ForegroundColor, Converter={StaticResource ColorToHexConverter}, UpdateSourceTrigger=PropertyChanged}" />
+                                <Button Grid.Column="1" Width="25" Content="..." Click="ForegroundColor_Click">
+                                    <!-- TODO: Implement color picker dialog -->
+                                </Button>
+                            </Grid>
+
+                            <!-- Window Width -->
+                            <Label Grid.Row="4" Grid.Column="0" Content="Window Width:" />
+                            <TextBox Grid.Row="4" Grid.Column="1"
+                                     Text="{Binding WindowWidth, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <!-- Window Height -->
+                            <Label Grid.Row="5" Grid.Column="0" Content="Window Height:" />
+                            <TextBox Grid.Row="5" Grid.Column="1"
+                                     Text="{Binding WindowHeight, UpdateSourceTrigger=PropertyChanged}" />
+                        </Grid>
+                    </GroupBox>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Process Tab -->
+            <TabItem Header="Process">
+                <GroupBox Header="Process Settings">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Process Name / PID -->
+                        <Label Grid.Row="0" Grid.Column="0" Content="Process Name / PID:" />
+                        <TextBox Grid.Row="0" Grid.Column="1"
+                                 Text="{Binding ProcessName, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <!-- Polling Rate -->
+                        <Label Grid.Row="1" Grid.Column="0" Content="Polling Rate (ms):" />
+                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical">
+                            <Slider Minimum="100" Maximum="5000" Value="{Binding PollingRate}"
+                                    TickFrequency="100" IsSnapToTickEnabled="True"
+                                    TickPlacement="BottomRight" />
+                            <TextBlock Text="{Binding PollingRate}" HorizontalAlignment="Center" />
+                        </StackPanel>
+                        
+                        <Label Grid.Row="2" Grid.Column="0" Content="Warn Threshold (%):" />
+                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Vertical">
+                            <Slider Value="{Binding WarningThreshold}"
+                                    Minimum="0"
+                                    Maximum="90"
+                                    TickFrequency="10"
+                                    IsSnapToTickEnabled="True"
+                                    TickPlacement="BottomRight"/>
+                            <TextBlock Text="{Binding WarningThreshold, StringFormat='{}{0}%'}"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
+            </TabItem>
+
+            <!-- Config Tab -->
+            <TabItem Header="Config">
+                <GroupBox Header="Configuration File">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Label Grid.Column="0" Grid.Row="1" Content="File Path:" />
+                        <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding ConfigFilePath, UpdateSourceTrigger=PropertyChanged}" />
+                        <Button Grid.Column="2" Grid.Row="1" Content="Browse..." Click="BrowseConfigFile_Click" Margin="5,0,0,0" />
+                    </Grid>
+                </GroupBox>
+            </TabItem>
+        </TabControl>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="Apply &amp; Close" Width="100" Click="ApplyAndClose_Click" Margin="0,0,10,0" />
+            <Button Content="Close" Width="80" Click="Close_Click" />
+        </StackPanel>
+    </Grid>
+</Window>
